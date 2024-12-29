@@ -6,7 +6,7 @@ def count_vertices(graph):
     for edge in graph:
         vertices.add(edge[0])
         vertices.add(edge[1])
-    return len(vertices)
+    return max(vertices) + 1
 
 
 def kruskal_mst(graph, vertices):
@@ -33,7 +33,6 @@ def main():
     ]
     vertices = count_vertices(edges)
     mst = kruskal_mst(edges, vertices)
-    print(edges)
     print(mst)
 
 
