@@ -22,7 +22,7 @@ class UF:
             self.rank[root_x] += 1
 
 
-def check_cycle(graph): # Usage Example
+def check_cycle(graph):  # Usage Example
     graph_size = max(max(x, y) for x, y in graph) + 1
     union = UF(graph_size)
     for x, y in graph:
