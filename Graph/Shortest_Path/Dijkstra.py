@@ -34,7 +34,7 @@ def dijkstra(graph, source, destination):
             # - Update the parent dictionary for path reconstruction
             # - Enqueue the min heap
             if dist + neighbor_distance < distance[neighbor]:
-                distance[neighbor] = dist + neighbor_distance
+                distance[neighbor] = dist + neighbor_distance # Relaxation
                 parent[neighbor] = curr_node
                 heapq.heappush(pq, (dist + neighbor_distance, neighbor))
 

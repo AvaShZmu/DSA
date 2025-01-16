@@ -3,10 +3,16 @@ import time
 from collections import deque
 import heapq
 
-# !! This is only for educational purpose only. A product from ChatGPT slop. !!
+# >>> This is only for educational purpose only. A product from ChatGPT slop. <<<
+                                                   # (And some modifications)
+
+# Options:
+only_show_path = False
+# If this option is enabled, hide the visited and frontier cells after path reconstruction
+
 
 # Function to draw the grid with various colors for visualization
-def draw_grid(screen, maze, cell_size, start, goal, visited, frontier, path=None):
+def draw_grid(screen, maze, cell_size, start, goal, visited, frontier, path=[]):
     """Draw the grid for the maze, including walls, start, goal, visited cells, and path."""
     rows, cols = len(maze), len(maze[0])
     colors = {
@@ -25,6 +31,8 @@ def draw_grid(screen, maze, cell_size, start, goal, visited, frontier, path=None
                 color = colors["start"]
             elif (r, c) == goal:
                 color = colors["goal"]
+            elif (r, c) in path:
+                color = colors["path"]
             elif (r, c) in visited:
                 color = colors["visited"]
             elif (r, c) in frontier:
@@ -36,18 +44,15 @@ def draw_grid(screen, maze, cell_size, start, goal, visited, frontier, path=None
 
             pygame.draw.rect(screen, color, (c * cell_size, r * cell_size, cell_size, cell_size))
 
-    # Draw the path
-    if path:
-        for pr, pc in path:
-            pygame.draw.rect(screen, colors["path"], (pc * cell_size, pr * cell_size, cell_size, cell_size))
-
     pygame.display.flip()
+
 
 # A* Algorithm
 def astar(maze, start, goal, rows, cols, screen, cell_size, clock):
     """Optimized A* algorithm with step-by-step visualization."""
+
     def heuristic(a, b):
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+        return abs(a[0] - b[0]) + abs(a[1] - b[1]) + 0.001 * (a[0] + a[1])
 
     visited = set()
     frontier = []  # Priority queue for A*
@@ -76,15 +81,15 @@ def astar(maze, start, goal, rows, cols, screen, cell_size, clock):
             while current:
                 path.append(current)
                 current = parent[current]
-            return path[::-1]
+            return path[::-1], visited, set(in_frontier.keys())
 
         r, c = current
         directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         for dr, dc in directions:
             nr, nc = r + dr, c + dc
-            if 0 <= nr < rows and 0 <= nc < cols and maze[nr][nc] == 0 and (nr, nc) not in visited:
+            if (0 <= nr < rows and 0 <= nc < cols) and maze[nr][nc] == 0 and (nr, nc) not in visited:
                 new_g_cost = g_costs[current] + 1
-                new_f_cost = new_g_cost + heuristic((nr, nc), goal)
+                new_f_cost = g_costs[current] + 1.5 * heuristic((nr, nc), goal)
 
                 if (nr, nc) not in g_costs or new_g_cost < g_costs[(nr, nc)]:
                     g_costs[(nr, nc)] = new_g_cost
@@ -132,7 +137,7 @@ def bfs(maze, start, goal, rows, cols, screen, cell_size, clock):
             while current:
                 path.append(current)
                 current = parent[current]
-            return path[::-1]
+            return path[::-1], visited, frontier
 
         r, c = current
         directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
@@ -173,7 +178,7 @@ def dfs(maze, start, goal, rows, cols, screen, cell_size, clock):
             while current:
                 path.append(current)
                 current = parent[current]
-            return path[::-1]
+            return path[::-1], visited, frontier
 
         r, c = current
         directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
@@ -189,6 +194,7 @@ def dfs(maze, start, goal, rows, cols, screen, cell_size, clock):
         clock.tick(60)  # Control the speed of the algorithm (60 FPS)
 
     return None
+
 
 # Function to create the maze interactively (unchanged)
 def create_maze(rows, cols, cell_size, screen, clock):
@@ -257,6 +263,7 @@ def create_maze(rows, cols, cell_size, screen, clock):
 
     pygame.quit()
 
+
 # The function to visualize the pathfinding algorithms
 def visualize_pathfinding(maze, start, goal, algorithm="BFS"):
     """Visualize the pathfinding process using Pygame."""
@@ -267,24 +274,28 @@ def visualize_pathfinding(maze, start, goal, algorithm="BFS"):
     pygame.display.set_caption(f"Maze Pathfinding Visualization - {algorithm}")
     clock = pygame.time.Clock()
 
-    visited = set()
-    frontier = set()  # This will hold the frontier nodes (actively being explored)
-    path = None
 
     # Run the selected algorithm
-    if algorithm == "BFS":
-        path = bfs(maze, start, goal, rows, cols, screen, cell_size, clock)
-    elif algorithm == "A*":
-        path = astar(maze, start, goal, rows, cols, screen, cell_size, clock)
-    elif algorithm == "DFS":
-        path = dfs(maze, start, goal, rows, cols, screen, cell_size, clock)
-
+    try:
+        if algorithm == "BFS":
+            path, visited, frontier = bfs(maze, start, goal, rows, cols, screen, cell_size, clock)
+        elif algorithm == "A*":
+            path, visited, frontier = astar(maze, start, goal, rows, cols, screen, cell_size, clock)
+        elif algorithm == "DFS":
+            path, visited, frontier = dfs(maze, start, goal, rows, cols, screen, cell_size, clock)
+    except TypeError:
+        print("There is no available path.")
+        pygame.quit()
+        return
+    global only_show_path
+    if only_show_path:
+        visited = set()
+        frontier = set()
     # Visualize the final path (mark it blue)
     if path:
-        for pr, pc in path:
-            maze[pr][pc] = 2  # Mark path (color it blue)
-            draw_grid(screen, maze, cell_size, start, goal, visited, frontier, path)
-            time.sleep(0.05)  # Pause to visualize the path step by step
+        print("Path found!")
+        draw_grid(screen, maze, cell_size, start, goal, visited, frontier, path)
+        time.sleep(0.05)  # Pause to visualize the path step by step
 
     running = True
     while running:
@@ -296,6 +307,7 @@ def visualize_pathfinding(maze, start, goal, algorithm="BFS"):
 
     pygame.quit()
 
+
 if __name__ == "__main__":
     rows, cols = 30, 30
     cell_size = 20
@@ -303,10 +315,10 @@ if __name__ == "__main__":
     # Initialize Pygame to allow user input to choose the algorithm
     while True:
         try:
-            input_choice = int(input("Choose your algorithm: "
-                                     "1. A* "
-                                     "2. BFS "
-                                     "3. DFS\n"))
+            input_choice = int(input("Choose your algorithm:\n"
+                                     "1. A* (Fastest)\n"
+                                     "2. BFS (Mid)\n"
+                                     "3. DFS (Dumbass)\n"))
             if 1 <= input_choice <= 3:
                 algorithm = ['A*', 'BFS', 'DFS', 'Bidirectional'][input_choice - 1]
                 break
