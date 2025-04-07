@@ -2,6 +2,7 @@ import pygame
 import time
 from collections import deque
 import heapq
+import math
 
 # >>> This is only for educational purpose only. A product from ChatGPT slop. <<<
                                                    # (And some modifications)
@@ -52,7 +53,7 @@ def astar(maze, start, goal, rows, cols, screen, cell_size, clock):
     """Optimized A* algorithm with step-by-step visualization."""
 
     def heuristic(a, b):
-        return abs(a[0] - b[0]) + abs(a[1] - b[1]) + 0.001 * (a[0] + a[1])
+        return math.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)
 
     visited = set()
     frontier = []  # Priority queue for A*
@@ -84,7 +85,16 @@ def astar(maze, start, goal, rows, cols, screen, cell_size, clock):
             return path[::-1], visited, set(in_frontier.keys())
 
         r, c = current
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        directions = [
+            (0, 1),  # right
+            (1, 0),  # down
+            (0, -1),  # left
+            (-1, 0),  # up
+            (1, 1),  # down-right (diagonal)
+            (1, -1),  # down-left (diagonal)
+            (-1, 1),  # up-right (diagonal)
+            (-1, -1),  # up-left (diagonal)
+        ]
         for dr, dc in directions:
             nr, nc = r + dr, c + dc
             if (0 <= nr < rows and 0 <= nc < cols) and maze[nr][nc] == 0 and (nr, nc) not in visited:
