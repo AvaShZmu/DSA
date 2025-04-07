@@ -1,0 +1,33 @@
++------------------------------------+
+| S............    X                 |
+|             .  XXXXX               |
+|             .  XXXXXXX             |
+|             .   XXXXXXXXX          |
+|             .     XXXXXXX          |
+|             .        XXXXX         |
+|             .       XXXXXXXXX      |
+|..............     XXXXXXXXXXX      |
+|.XXXXXXXXXXXXXXXXXXXXXXXXXXXX       |
+|..............    XXXXXXX           |
+|             . XXXXXXXXXX           |
+|             . XXXXXXXXX            |
+|             .XXXXXXXXXX            |
+|             .XXXXXXXXX             |
+|             . XXXXXXXX             |
+|             .    X                 |
+|             .    X                 |
+|             .    X                 |
+|             .    X                 |
+|             .    X                 |
+|             .  XXXXX               |
+|             .  XXXXXX              |
+|             . XXXXXXX              |
+|            ..XXXXXX                |
+|          ...XXXXXXX                |
+|         ..XXXXXXXXX                |
+|        ..XXXXXXXX                  |
+|     ....XXXXXXX                    |
+|     .XXXXXXXX                      |
+|     ..XXXXXXG                      |
+|      ........                      |
++------------------------------------+
